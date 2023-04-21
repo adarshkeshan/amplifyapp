@@ -4,3 +4,46 @@ type Note @model @auth(rules: [ { allow: public } ] ){
   description: String
   image: String
 }
+
+type Adline @model @auth(rules: [ { allow: public } ] ){
+	dim_ad_id: ID!
+	ad_name: String
+	ad_cfid: String
+	ad_url: String
+	ad_status: String
+	ms_ss: String
+	line_item_type: String
+	sales_vertical: String
+	advertiser_vertical: String
+	advertiser_cfid: String
+	advertiser_name: String
+	service_type: String
+	advertiser_industry: String
+	advertiser_sub_industry: String
+	campaign_cfid: String
+	campaign_name: String
+	campaign_goal: String
+	campaign_goal_category: String
+	is_supply_3px: Int
+	is_supply_ono: Int
+	is_supply_aps: Int
+	is_endemic: Int
+	is_onsite: Int
+	is_offsite: Int
+	base_bid: Int
+	dim_date: AWSDate!
+	impressions: Int
+	spend: Float
+	clicks: Int
+	m2_considerations_click: Int
+	purchases: Int
+	purchase_amounts: Float
+	avg_max_bid: Float
+	number_bid_request_eligible: Int
+	number_bid_request_won_in_cs: Int
+	number_impressions: Int
+	total_impression_at_max_bid: Int
+	internal_win_rate: Float
+	external_win_rate: Float
+	average_bidamount_among_bids: Float
+}
