@@ -1,61 +1,144 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
-import "@aws-amplify/ui-react/styles.css";
-import { API, Storage } from 'aws-amplify';
-import {
-  Button,
-  Flex,
-  Heading,
-  Image,
-  Text,
-  TextField,
-  View,
-  withAuthenticator,
-} from '@aws-amplify/ui-react';
+import React, { useState, useEffect } from 'react';
+import { API, graphqlOperation } from 'aws-amplify';
 import { listNotes,listAdlines } from "./graphql/queries";
-import {
-  createNote as createNoteMutation,
-  deleteNote as deleteNoteMutation,
-} from "./graphql/mutations";
+import './AdMetricsTable.css'; // import your CSS file here
 
-const App = ({ signOut }) => {
-  const [notes, setAdLines] = useState([]);
+function AdlinesTable() {
+  const [adlines, setAdlines] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchAdLines();
+    const fetchData = async () => {
+      try {
+        const apiData = await API.graphql(graphqlOperation(listAdlines, {limit: 10}));
+        const adlinesData = apiData.data.listAdlines.items;
+        setAdlines(adlinesData);
+        setLoading(false);
+      } catch (error) {
+        console.log('Error fetching adlines:', error);
+      }
+    };
+    fetchData();
   }, []);
 
-async function fetchAdLines() {
-  const apiData = await API.graphql({ query: listAdlines });
-  const notesFromAPI = apiData.data.listAdlines.items;
-  setAdLines(notesFromAPI);
-}
-  
+  if (loading) return <p>Loading...</p>;
 
   return (
-    <View className="App">
-      <Heading level={1}>My Notes App</Heading>
-      <Heading level={2}>Current AdLines</Heading>
-      <View margin="3rem 0">
-        
-{notes.map((note) => (
-  <Flex
-    key={note.dim_ad_id}
-    direction="row"
-    justifyContent="center"
-    alignItems="center"
-  >
-    <Text as="span">{note.ad_name}</Text>
-    <Text as="span">{note.dim_ad_id}</Text>
-    <Text as="span">{note.campaign_name}</Text>
-    <Text as="span">{note.advertiser_name}</Text>
-    <Text as="span">{note.campaign_goal}</Text>
-  </Flex>
-))}
-      </View>
-      <Button onClick={signOut}>Sign Out</Button>
-    </View>
-  );
-};
 
-export default withAuthenticator(App);
+
+    <div class="table-container">
+          <h1>Ad Line Attribute</h1>
+
+  <table>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>CFID</th>
+          <th>URL</th>
+          <th>Status</th>
+          <th>MS SS</th>
+          <th>Line Item Type</th>
+          <th>Sales Vertical</th>
+          <th>Advertiser Vertical</th>
+          <th>Advertiser CFID</th>
+          <th>Advertiser Name</th>
+          <th>Service Type</th>
+          <th>Advertiser Industry</th>
+          <th>Advertiser Sub Industry</th>
+          <th>Campaign CFID</th>
+          <th>Campaign Name</th>
+          <th>Campaign Goal</th>
+          <th>Campaign Goal Category</th>
+        </tr>
+      </thead>
+      <tbody>
+        {adlines.map(ad => (
+          <tr key={ad.dim_ad_id}>
+            <td>{ad.dim_ad_id}</td>
+            <td>{ad.ad_name}</td>
+            <td>{ad.ad_cfid}</td>
+            <td>{ad.ad_url}</td>
+            <td>{ad.ad_status}</td>
+            <td>{ad.ms_ss}</td>
+            <td>{ad.line_item_type}</td>
+            <td>{ad.sales_vertical}</td>
+            <td>{ad.advertiser_vertical}</td>
+            <td>{ad.advertiser_cfid}</td>
+            <td>{ad.advertiser_name}</td>
+            <td>{ad.service_type}</td>
+            <td>{ad.advertiser_industry}</td>
+            <td>{ad.advertiser_sub_industry}</td>
+            <td>{ad.campaign_cfid}</td>
+            <td>{ad.campaign_name}</td>
+            <td>{ad.campaign_goal}</td>
+            <td>{ad.campaign_goal_category}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </table>
+
+  <h1>Ad Line Measurement</h1>
+
+
+  <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Ad ID</th>
+          <th>Impressions</th>
+          <th>Spend</th>
+          <th>Clicks</th>
+          <th>M2 Considerations Click</th>
+          <th>Purchases</th>
+          <th>Purchase Amounts</th>
+          <th>Avg Max Bid</th>
+          <th>Number Bid Request Eligible</th>
+          <th>Number Bid Request Won In CS</th>
+          <th>Number Impressions</th>
+          <th>Total Impression At Max Bid</th>
+          <th>Internal Win Rate</th>
+          <th>External Win Rate</th>
+          <th>Average Bid Amount Among Bids</th>
+        </tr>
+      </thead>
+      <tbody>
+        {adlines.map(adMetric => (
+          <tr key={`${adMetric.dim_date}-${adMetric.dim_ad_id}`}>
+            <td>{adMetric.dim_date}</td>
+            <td>{adMetric.dim_ad_id}</td>
+            <td>{adMetric.impressions}</td>
+            <td>{adMetric.spend}</td>
+            <td>{adMetric.clicks}</td>
+            <td>{adMetric.m2_considerations_click}</td>
+            <td>{adMetric.purchases}</td>
+            <td>{adMetric.purchase_amounts}</td>
+            <td>{adMetric.avg_max_bid}</td>
+            <td>{adMetric.number_bid_request_eligible}</td>
+            <td>{adMetric.number_bid_request_won_in_cs}</td>
+            <td>{adMetric.number_impressions}</td>
+            <td>{adMetric.total_impression_at_max_bid}</td>
+            <td>{adMetric.internal_win_rate}</td>
+            <td>{adMetric.external_win_rate}</td>
+            <td>{adMetric.average_bidamount_among_bids}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+</div>
+
+
+
+  );
+}
+
+export default function App() {
+  return (
+    <div>
+      <h1>Adlines</h1>
+      <AdlinesTable />
+    </div>
+  );
+}
